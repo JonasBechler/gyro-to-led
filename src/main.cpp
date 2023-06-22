@@ -4,6 +4,7 @@
 
 #include "../gyro/GY521_Handler.h"
 #include "../analog_pin/Analog_Pin.h"
+#include "../led/Led_Handler.h"
 
 //library für analog machen? :)
 //library für 4 leds machen? :(
@@ -19,13 +20,14 @@ GY521 gyro(0x68);
 Data_GY521 gyro_data;
 
 // Photoresistor
-Analog_Pin_Config photo_resistor_config = {};
-photo_resistor_config.pin = 5;
-photo_resistor_config.smoothing_method = low_pass;
-photo_resistor_config.low_pass_value = 0.1;
-//photo_resistor_config.floating_avg_size = 5;
+Analog_Pin_Config photo_resistor_config = {
+    5,                          // pin
+    Smoothing_Method::low_pass, // smoothing_method
+    0.1f,                       // low_pass_value
+    5                           // floating_avg_size
+};
 
-Analog_Pin photo_resistor(photo_resistor_config)
+Analog_Pin photo_resistor(&photo_resistor_config);
 
 
 
@@ -35,8 +37,13 @@ void setup() {
   Serial.println();
   Serial.println(__FILE__);
 
+  photo_resistor.init();
+
+
 }
 
 void loop() {
+  photo_resistor.update();
+
 }
 

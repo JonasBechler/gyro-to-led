@@ -31,8 +31,8 @@ Analog_Pin::Analog_Pin(Analog_Pin_Config* config)
     break;
 
   case floating_avg:
-    free(this->floating_buffer);
-    this->floating_buffer = ( int )malloc(this->config->floating_avg_size);
+    free(this->floating_avg_buffer);
+    this->floating_avg_buffer = ( int )malloc(this->config->floating_avg_size);
     break;
   }
 }
@@ -47,7 +47,7 @@ Analog_Pin::~Analog_Pin() {
     break;
 
   case floating_avg:
-    free(this->floating_buffer);
+    free(this->floating_avg_buffer);
     break;
   }
 }
@@ -55,7 +55,7 @@ Analog_Pin::~Analog_Pin() {
 /***************************************************
  * Init + Update
  ***************************************************/
-Analog_Pin::init()
+void Analog_Pin::init()
 {
   switch (this->config->smoothing_method)
   {
@@ -68,20 +68,17 @@ Analog_Pin::init()
     break;
 
   case floating_avg:
-    free(this->floating_buffer);
-    this->floating_buffer = ( int )malloc(this->config->floating_avg_size);
-
     floating_avg_index = 0;
 
     for (int i = 0; i < this->config->floating_avg_size; i++){
-      this->floating_buffer[i] = analogRead(this->config->pin);
+      this->floating_avg_buffer[i] = analogRead(this->config->pin);
       delay(1);
     }
     break;
   }
 }
 
-Analog_Pin::update()
+void Analog_Pin::update()
 {
   switch (this->config->smoothing_method)
   {
@@ -94,7 +91,7 @@ Analog_Pin::update()
     break;
 
   case floating_avg:
-    this->floating_buffer[this->floating_avg_index] = analogRead(this->config->pin);
+    this->floating_avg_buffer[this->floating_avg_index] = analogRead(this->config->pin);
     if(this->floating_avg_index < this->config->floating_avg_size - 1){
       this->floating_avg_index = this->floating_avg_index + 1;
     }
@@ -108,7 +105,7 @@ Analog_Pin::update()
 /***************************************************
  * Getters
  ***************************************************/
-Analog_Pin::getState()
+int Analog_Pin::getState()
 {
   int ret_val = 0;
   switch (this->config->smoothing_method)
@@ -123,7 +120,7 @@ Analog_Pin::getState()
 
   case floating_avg:
     for (int i = 0; i < this->config->floating_avg_size; i++){
-      ret_val += this->floating_buffer[i];
+      ret_val += this->floating_avg_buffer[i];
     }
     ret_val = (int) (ret_val / this->config->floating_avg_size);
     break;
