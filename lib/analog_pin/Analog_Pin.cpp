@@ -32,7 +32,7 @@ Analog_Pin::Analog_Pin(Analog_Pin_Config* config)
 
   case floating_avg:
     free(this->floating_avg_buffer);
-    this->floating_avg_buffer = ( int )malloc(this->config->floating_avg_size);
+    this->floating_avg_buffer = ( int* )malloc(this->config->floating_avg_size);
     break;
   }
 }

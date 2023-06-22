@@ -6,14 +6,12 @@
 #include "../analog_pin/Analog_Pin.h"
 #include "../led/Led_Handler.h"
 
-//library für analog machen? :)
-//library für 4 leds machen? :(
 
-//TODO: correct pins
-#define LeftLedPin 5
-#define RightLedPin 5
-#define TopLedPin 5
-#define BottomLedPin 5
+// Leds
+Led_Handler left_led(5, 100);
+Led_Handler right_led(5, 100);
+Led_Handler top_led(5, 100);
+Led_Handler bottom_led(5, 100);
 
 // Gyro
 GY521 gyro(0x68);
@@ -28,6 +26,8 @@ Analog_Pin_Config photo_resistor_config = {
 };
 
 Analog_Pin photo_resistor(&photo_resistor_config);
+
+
 
 
 
