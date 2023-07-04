@@ -16,6 +16,12 @@ Led_Handler bottom_led(5, 100);
 // Gyro
 GY521 gyro(0x68);
 Data_GY521 gyro_data;
+Data_GY521 gyro_data_old;
+Data_GY521 lowpass_gyro_data;
+Data_GY521 lowpass_gyro_data_old;
+Data_GY521 delta_lowpass_gyro_data;
+float lowpass_value = 0.75;
+
 
 // Photoresistor
 Analog_Pin_Config photo_resistor_config = {
@@ -39,11 +45,39 @@ void setup() {
 
   photo_resistor.init();
 
+  gyro.read();
+  setData_GY521(&gyro, &gyro_data);
+  gyro_data_old = gyro_data;
+  lowpass_gyro_data = gyro_data;
+  lowpass_gyro_data_old = gyro_data;
 
 }
+
 
 void loop() {
   photo_resistor.update();
 
+  gyro_data_old = gyro_data;
+  lowpass_gyro_data_old = lowpass_gyro_data;
+
+  gyro.read();
+  setData_GY521(&gyro, &gyro_data);
+
+  check_over_under_flow(&gyro_data, &gyro_data_old);
+  
+  // lowpass_gyro_data = lowpass_gyro_data * lowpass_value + gyro_data * (1 - lowpass_value)
+  mult_Data_GY521(&lowpass_gyro_data, lowpass_value);
+  mult_Data_GY521(&gyro_data, 1.0 - lowpass_value);
+  add_Data_GY521(&lowpass_gyro_data, &gyro_data);
+
+  check_over_under_flow(&lowpass_gyro_data, &lowpass_gyro_data_old);
+
+  // delta_lowpass_gyro_data = lowpass_gyro_data - lowpass_gyro_data_old
+  delta_lowpass_gyro_data = lowpass_gyro_data_old;
+  neg_Data_GY521(&delta_lowpass_gyro_data);
+  add_Data_GY521(&delta_lowpass_gyro_data, lowpass_gyro_data);
+
 }
+
+
 

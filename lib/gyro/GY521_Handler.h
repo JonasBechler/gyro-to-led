@@ -25,7 +25,7 @@ void init_GY521(GY521 *sensor);
 
 void setData_GY521(GY521 *sensor, Data_GY521 *data);
 
-// Beautyfy
+// Beautyfy SVG
 void getDataStringInit_GY521(String &buf);
 void getDataString_GY521(Data_GY521 *data, String &buf);
 
@@ -33,5 +33,7 @@ void getDataString_GY521(Data_GY521 *data, String &buf);
 void neg_Data_GY521(Data_GY521 *dataA);
 void add_Data_GY521(Data_GY521 *dataA, Data_GY521 *dataB);
 void mult_Data_GY521(Data_GY521 *dataA, float factor);
+void check_over_under_flow(Data_GY521* now, Data_GY521* old);
+
 
 #endif

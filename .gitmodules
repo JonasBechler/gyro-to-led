@@ -1,0 +1,3 @@
+[submodule "lib/GY521_Handler"]
+	path = lib/GY521_Handler
+	url = git@github.com:JonasBechler/GY521_Handler.git

@@ -131,3 +131,34 @@ void mult_Data_GY521(Data_GY521 *dataA, float factor)
   dataA->Yaw = dataA->Yaw * factor;
   dataA->Temp = dataA->Temp * factor;
 }
+
+
+void check_over_under_flow(Data_GY521* now, Data_GY521* old)
+{
+  if (now->Pitch < 50 && old->Pitch > 360-50)
+  {
+    old->Pitch= old->Pitch - 360;
+  }
+  else if  (now.->Pitch > 360-50 && old->Pitch < 50)
+  {
+    old->Pitch = old->Pitch + 360;
+  }
+
+  if (now->Roll < 50 && old->Roll > 360-50)
+  {
+    old->Roll = old->Roll - 360;
+  }
+  else if  (now->Roll > 360-50 && old->Roll < 50)
+  {
+    old->Roll = old->Roll + 360;
+  }
+
+  if (now.Yaw < 50 && old.Yaw > 360-50)
+  {
+    old.Yaw = old.Yaw - 360;
+  }
+  else if  (now.Yaw > 360-50 && old.Yaw < 50)
+  {
+    old.Yaw = old.Yaw + 360;
+  }
+}
