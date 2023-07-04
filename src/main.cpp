@@ -2,7 +2,7 @@
 // main controller for esp32 to controll 4 lights with the gy521 and turns on when a theshold is detectetd (floating average 1-10s?)
 // Kondesnatoren und stepdown?
 
-#include "../gyro/GY521_Handler.h"
+#include "../GY521_Handler/GY521_Handler.h"
 #include "../analog_pin/Analog_Pin.h"
 #include "../led/Led_Handler.h"
 
@@ -32,10 +32,6 @@ Analog_Pin_Config photo_resistor_config = {
 };
 
 Analog_Pin photo_resistor(&photo_resistor_config);
-
-
-
-
 
 
 void setup() {
