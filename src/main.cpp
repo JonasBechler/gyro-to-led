@@ -3,68 +3,68 @@
 // Kondesnatoren und stepdown?
 
 #include "../GY521_Handler/GY521_Handler.h"
-//#include "../analog_pin/Analog_Pin.h"
-//#include "../led/Led_Handler.h"
+#include "../analog_pin/Analog_Pin.h"
+#include "../led/Led_Handler.h"
+#include "../filter/Low_Pass_Filter.h"
 
 
 // Leds
-/*
-Led_Handler left_led(5, 100);
-Led_Handler right_led(5, 100);
-Led_Handler top_led(5, 100);
-Led_Handler bottom_led(5, 100);
-*/
+Led_Handler left_led(25, 255);
+Led_Handler center_led(26, 255);
+Led_Handler right_led(27, 255);
+
 
 // Gyro
 GY521 gyro(0x68);
 Data_GY521 gyro_data;
-Data_GY521 delta_gyro_data;
 Data_GY521 gyro_data_old;
-Data_GY521 lowpass_gyro_data;
-Data_GY521 lowpass_gyro_data_old;
-Data_GY521 delta_lowpass_gyro_data;
+Data_GY521 delta_gyro_data;
+Data_GY521 lowpass_delta_gyro_data;
 float lowpass_value = 0.75;
 
 unsigned long t_now = 0;
 unsigned long t_last = 0;
 int t_diff = 0;
 
+float curve_speed_theshold = 0.005;
+
 
 // Photoresistor
-/*
-Analog_Pin_Config photo_resistor_config = {
-    5,                          // pin
-    Smoothing_Method::low_pass, // smoothing_method
-    0.1f,                       // low_pass_value
-    5                           // floating_avg_size
-};
+Analog_Pin photo_resistor(5);
+Low_Pass photo_resistor_lowpass(0.98);
 
-Analog_Pin photo_resistor(&photo_resistor_config);
-*/
 
 void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println(__FILE__);
 
-  //photo_resistor.init();
+  left_led.setValue(255);
+  center_led.setValue(255);
+  right_led.setValue(255);
+
   Wire.begin();
   delay(100);
   init_GY521(&gyro);
+
+  photo_resistor.init();
+  photo_resistor_lowpass.start(photo_resistor.getState());
+
+
+
+  delay(10);
   gyro.read();
   setData_GY521(&gyro, &gyro_data);
   gyro_data_old = gyro_data;
-  lowpass_gyro_data = gyro_data;
-  lowpass_gyro_data_old = gyro_data;
 
 }
 
 
 void loop() {
-  //photo_resistor.update();
+  photo_resistor.update();
+  photo_resistor_lowpass.next(photo_resistor.getState());
 
   gyro_data_old = gyro_data;
-  lowpass_gyro_data_old = lowpass_gyro_data;
 
   gyro.read();
   // capture time difference
@@ -74,17 +74,9 @@ void loop() {
 
 
   setData_GY521(&gyro, &gyro_data);
-
   check_over_under_flow(&gyro_data, &gyro_data_old);
   
-  /*
-  // lowpass_gyro_data = lowpass_gyro_data * lowpass_value + gyro_data * (1 - lowpass_value)
-  mult_Data_GY521(&lowpass_gyro_data, lowpass_value);
-  mult_Data_GY521(&gyro_data, 1.0 - lowpass_value);
-  add_Data_GY521(&lowpass_gyro_data, &gyro_data);
-
-  check_over_under_flow(&lowpass_gyro_data, &lowpass_gyro_data_old);
-  */
+  
 
   // delta_gyro_data = (gyro_data - gyro_data_old) / t_diff
   delta_gyro_data = gyro_data_old;
@@ -93,9 +85,36 @@ void loop() {
   mult_Data_GY521(&delta_gyro_data, 1.0 / t_diff);
   //Serial.println(t_diff);
 
+  
+  // lowpass_delta_gyro_data = lowpass_delta_gyro_data * lowpass_value + delta_gyro_data * (1 - lowpass_value)
+  mult_Data_GY521(&lowpass_delta_gyro_data, lowpass_value);
+  mult_Data_GY521(&delta_gyro_data, 1.0 - lowpass_value);
+  add_Data_GY521(&lowpass_delta_gyro_data, &delta_gyro_data);
+
+  // negative -> right
+  if (lowpass_delta_gyro_data.Yaw < -curve_speed_theshold)
+  {
+    left_led.set(false);
+    right_led.set(true);
+  }
+  // positive -> left
+  else if (lowpass_delta_gyro_data.Yaw > curve_speed_theshold)
+  {
+    left_led.set(true);
+    right_led.set(false);
+  }
+  // in center range
+  else
+  {
+    left_led.set(false);
+    right_led.set(false);
+  }
+
+
+
   //delta_lowpass_gyro_data
   String bufferString;
-  getDataString_GY521(&delta_gyro_data, bufferString);
+  getDataString_GY521(&lowpass_delta_gyro_data, bufferString);
   Serial.println(bufferString);
 
   delay(10);

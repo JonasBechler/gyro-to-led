@@ -18,38 +18,10 @@
 /***************************************************
  * Con- & Destructor
  ***************************************************/
-Analog_Pin::Analog_Pin(Analog_Pin_Config* config)
+Analog_Pin::Analog_Pin(int pin)
 {
-  this->config = config;
+  this->pin = pin;
 
-  switch (this->config->smoothing_method)
-  {
-  case none:
-    break;
-  
-  case low_pass:
-    break;
-
-  case floating_avg:
-    free(this->floating_avg_buffer);
-    this->floating_avg_buffer = ( int* )malloc(this->config->floating_avg_size);
-    break;
-  }
-}
-
-Analog_Pin::~Analog_Pin() {
-  switch (this->config->smoothing_method)
-  {
-  case none:
-    break;
-  
-  case low_pass:
-    break;
-
-  case floating_avg:
-    free(this->floating_avg_buffer);
-    break;
-  }
 }
 
 /***************************************************
@@ -57,49 +29,12 @@ Analog_Pin::~Analog_Pin() {
  ***************************************************/
 void Analog_Pin::init()
 {
-  switch (this->config->smoothing_method)
-  {
-  case none:
-    this->none_buffer = analogRead(this->config->pin);
-    break;
-  
-  case low_pass:
-    low_pass_buffer = analogRead(this->config->pin);
-    break;
-
-  case floating_avg:
-    floating_avg_index = 0;
-
-    for (int i = 0; i < this->config->floating_avg_size; i++){
-      this->floating_avg_buffer[i] = analogRead(this->config->pin);
-      delay(1);
-    }
-    break;
-  }
+  this->buf = analogRead(this->pin);
 }
 
 void Analog_Pin::update()
 {
-  switch (this->config->smoothing_method)
-  {
-  case none:
-    this->none_buffer = analogRead(this->config->pin);
-    break;
-  
-  case low_pass:
-    this->low_pass_buffer = this->low_pass_buffer * (1 - this->config->low_pass_value) + analogRead(this->config->pin) * this->config->low_pass_value;
-    break;
-
-  case floating_avg:
-    this->floating_avg_buffer[this->floating_avg_index] = analogRead(this->config->pin);
-    if(this->floating_avg_index < this->config->floating_avg_size - 1){
-      this->floating_avg_index = this->floating_avg_index + 1;
-    }
-    else{
-      this->floating_avg_index = 0;
-    }
-    break;
-  }
+  this->buf = analogRead(this->pin);
 }
     
 /***************************************************
@@ -107,23 +42,6 @@ void Analog_Pin::update()
  ***************************************************/
 int Analog_Pin::getState()
 {
-  int ret_val = 0;
-  switch (this->config->smoothing_method)
-  {
-  case none:
-    ret_val = none_buffer; 
-    break;
-  
-  case low_pass:
-    ret_val = (int) low_pass_buffer; 
-    break;
-
-  case floating_avg:
-    for (int i = 0; i < this->config->floating_avg_size; i++){
-      ret_val += this->floating_avg_buffer[i];
-    }
-    ret_val = (int) (ret_val / this->config->floating_avg_size);
-    break;
-  }
+  int ret_val = this->buf;
   return ret_val;
 }

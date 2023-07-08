@@ -24,10 +24,12 @@ class Led_Handler
 {
 private:
     int pin;
+    int value;
     int max_value;
 
 public:
     Led_Handler(int pin, int max_value);
+    void set(bool onoff);
     void setValue(int value);
 };
 #endif
