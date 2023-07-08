@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * Author:     Jonas Bechler
  * Date  :     22.06.2023
@@ -15,7 +17,6 @@
 #define ANALOG_PIN_h
 
 #include "Arduino.h"
-#include <Analog_Pin.h>
 
 
 enum Smoothing_Method{
@@ -48,6 +49,7 @@ private:
 
 public:
     Analog_Pin(Analog_Pin_Config* config);
+    ~Analog_Pin();
 
     void init();
     void update();

@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * Author:     Jonas Bechler
  * Date  :     22.06.2023
@@ -15,7 +17,6 @@
 #define LED_HANDLER_h
 
 #include "Arduino.h"
-#include <Led_Handler.h>
 
 
 
