@@ -38,7 +38,7 @@ public:
     void init();
     void update();
     
-    int getState();
+    int getValue();
 };
 #endif
 

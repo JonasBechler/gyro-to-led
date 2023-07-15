@@ -40,7 +40,7 @@ void Analog_Pin::update()
 /***************************************************
  * Getters
  ***************************************************/
-int Analog_Pin::getState()
+int Analog_Pin::getValue()
 {
   int ret_val = this->buf;
   return ret_val;

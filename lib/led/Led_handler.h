@@ -26,9 +26,13 @@ private:
     int pin;
     int value;
     int max_value;
+    bool led_state;
+    unsigned long previous_millis;
+    unsigned long delay_duration;
+
 
 public:
-    Led_Handler(int pin, int max_value);
+    Led_Handler(int pin, int max_value, unsigned long delay_duration);
     void set(bool onoff);
     void setValue(int value);
 };
