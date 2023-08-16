@@ -26,6 +26,11 @@ Led_Handler::Led_Handler(int pin, int max_value, unsigned long delay_duration)
   this->value = 5;
 }
 
+void Led_Handler::init()
+{
+  analogWrite(this->pin, 0);
+}
+
 /***************************************************
  * Setters
  ***************************************************/
@@ -52,6 +57,27 @@ void Led_Handler::set(bool onoff)
 
 void Led_Handler::setValue(int value)
 {
-  this->value = value;
-  analogWrite(this->pin, map(this->value, 0, 256, 0, this->max_value));
+  if (this->led_state && value != this->value)
+  {
+    if (millis() - this->previous_millis >= this->delay_duration)
+    {
+      this->value = value;
+      analogWrite(this->pin, map(this->value, 0, 256, 0, this->max_value));
+      this->previous_millis = millis();
+    }
+  }
+  else
+  {
+    this->value = value;
+  }
+}
+
+void Led_Handler::blink(int t_on_off)
+{
+  uint8_t current_value = (millis() / t_on_off) % 2;
+  analogWrite(this->pin, map(this->value * current_value, 0, 256, 0, this->max_value));
+  this->previous_millis = 0;
+    
+  
+
 }

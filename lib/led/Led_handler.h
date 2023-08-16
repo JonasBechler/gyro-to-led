@@ -33,8 +33,11 @@ private:
 
 public:
     Led_Handler(int pin, int max_value, unsigned long delay_duration);
+    void init();
     void set(bool onoff);
     void setValue(int value);
+    void blink(int t_on_off);
+
 };
 #endif
 
