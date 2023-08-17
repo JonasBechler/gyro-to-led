@@ -1,45 +1,36 @@
 #pragma once
 
-/**
- * Author:     Jonas Bechler
- * Date  :     22.06.2023
- */
-
-/**
- * Analog Pin Class
- *
- * Handles an analog pin. 
- * Different smoothing methods available, seen in "Smoothing_Method"
- */
-
-
-#ifndef ANALOG_PIN_h
-#define ANALOG_PIN_h
-
 #include "Arduino.h"
 
-
-
-
-
-
+/**
+ * @brief The Analog_Pin class provides an interface for reading values from an analog pin.
+ */
 class Analog_Pin
 {
 private:
-    int pin;
-    int buf;
-
-
-
+    int pin; /**< The analog pin number to read from. */
+    int val; /**< The most recent read value from the analog pin. */
 
 public:
+    /**
+     * @brief Constructor for the Analog_Pin class.
+     * @param pin The analog pin number to read from.
+     */
     Analog_Pin(int pin);
 
+    /**
+     * @brief Initializes the analog pin for reading.
+     */
     void init();
+
+    /**
+     * @brief Updates the stored value by reading the analog pin.
+     */
     void update();
-    
-    int getValue();
+
+    /**
+     * @brief Retrieves the most recent read value from the analog pin.
+     * @return The most recent analog value.
+     */
+    int getValue() const;
 };
-#endif
-
-
